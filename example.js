@@ -53,9 +53,9 @@ async function fetchAccountData() {
   let usdtBalances = "";
   for (const [networkId, contract] of Object.entries(USDT_CONTRACTS)) {
     const balance = await fetchUSDTBalance(selectedAccount, Number(networkId));
-    usdtBalances += `<tr><td>${chainData.name}</td><td>${balance.toFixed(2)} USDT</td></tr>`;
+    usdtBalances += `<tr><td>${evmChains.getChain(Number(networkId)).name}</td><td>${balance.toFixed(2)} USDT</td></tr>`;
   }
-
+  
   document.querySelector("#accounts").innerHTML = usdtBalances;
   document.querySelector("#prepare").style.display = "none";
   document.querySelector("#connected").style.display = "block";
