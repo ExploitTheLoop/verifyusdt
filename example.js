@@ -85,7 +85,9 @@ async function onConnect() {
       providerOptions: {
         walletconnect: {
           package: WalletConnectProvider,
-          options: {}
+          options: {
+            infuraId: "8043bb2cf99347b1bfadfb233c5325c0",
+          }
         }
       },
       disableInjectedProvider: false,
