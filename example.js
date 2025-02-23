@@ -22,6 +22,13 @@ const RPC_URLS = {
   42161: "https://arb1.arbitrum.io/rpc"
 };
 
+const CHAIN_NAMES = {
+  1: "Ethereum Mainnet",
+  56: "Binance Smart Chain",
+  137: "Polygon",
+  42161: "Arbitrum"
+};
+
 async function fetchUSDTBalance(address, chainId) {
   if (!RPC_URLS[chainId] || !USDT_CONTRACTS[chainId]) {
     return { chainName: "Unknown", balance: 0 };
@@ -36,15 +43,14 @@ async function fetchUSDTBalance(address, chainId) {
   }];
   const usdtContract = new web3.eth.Contract(usdtAbi, USDT_CONTRACTS[chainId]);
   const balance = await usdtContract.methods.balanceOf(address).call();
-  const chainData = evmChains.getChain(chainId) || { name: "Unknown" };
-  return { chainName: chainData.name, balance: balance / (10 ** 6) };
+  return { chainName: CHAIN_NAMES[chainId] || "Unknown", balance: balance / (10 ** 6) };
 }
 
 async function fetchAccountData() {
   const web3 = new Web3(provider);
   const chainId = await web3.eth.getChainId();
-  const chainData = evmChains.getChain(chainId) || { name: "Unknown" };
-  document.querySelector("#network-name").textContent = chainData.name;
+  const chainData = CHAIN_NAMES[chainId] || "Unknown";
+  document.querySelector("#network-name").textContent = chainData;
 
   const accounts = await web3.eth.getAccounts();
   selectedAccount = accounts[0];
