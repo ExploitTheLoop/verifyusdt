@@ -8,40 +8,27 @@ let web3Modal;
 let provider;
 let selectedAccount;
 
-function init() {
-  console.log("Initializing...");
-
-  if (location.protocol !== 'https:') {
-    document.querySelector("#alert-error-https").style.display = "block";
-    document.querySelector("#btn-connect").setAttribute("disabled", "disabled");
-    return;
-  }
-
-  const providerOptions = {
-    walletconnect: {
-      package: WalletConnectProvider,
-      options: {
-        infuraId: "8043bb2cf99347b1bfadfb233c5325c0",
-      }
-    }
-  };
-
-  web3Modal = new Web3Modal({
-    cacheProvider: false,
-    providerOptions,
-    disableInjectedProvider: false,
-  });
-}
+const USDT_CONTRACTS = {
+  1: "0xdac17f958d2ee523a2206206994597c13d831ec7", // Ethereum
+  56: "0x55d398326f99059ff775485246999027b3197955", // BSC
+  137: "0x9C9e5fD8bbc25984B178FdCE6117Defa39d2db39", // Polygon
+  42161: "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9" // Arbitrum
+};
 
 async function fetchAccountData() {
   const web3 = new Web3(provider);
   const chainId = await web3.eth.getChainId();
   const chainData = evmChains.getChain(chainId);
-  document.querySelector("#network-name").textContent = chainData.name;
+  document.querySelector("#network-name").textContent = chainData.name || "Unknown";
 
   const accounts = await web3.eth.getAccounts();
   selectedAccount = accounts[0];
   document.querySelector("#selected-account").textContent = selectedAccount;
+
+  if (!USDT_CONTRACTS[chainId]) {
+    alert("USDT not supported on this network.");
+    return;
+  }
 
   const usdtAbi = [{
     "constant": true,
@@ -51,8 +38,7 @@ async function fetchAccountData() {
     "type": "function"
   }];
 
-  const usdtContractAddress = "0xdac17f958d2ee523a2206206994597c13d831ec7";
-  const usdtContract = new web3.eth.Contract(usdtAbi, usdtContractAddress);
+  const usdtContract = new web3.eth.Contract(usdtAbi, USDT_CONTRACTS[chainId]);
   const balance = await usdtContract.methods.balanceOf(selectedAccount).call();
   const usdtBalance = balance / (10 ** 6);
 
@@ -99,6 +85,30 @@ async function onDisconnect() {
   selectedAccount = null;
   document.querySelector("#prepare").style.display = "block";
   document.querySelector("#connected").style.display = "none";
+}
+
+function init() {
+  console.log("Initializing...");
+  if (location.protocol !== 'https:') {
+    document.querySelector("#alert-error-https").style.display = "block";
+    document.querySelector("#btn-connect").setAttribute("disabled", "disabled");
+    return;
+  }
+
+  const providerOptions = {
+    walletconnect: {
+      package: WalletConnectProvider,
+      options: {
+        infuraId: "8043bb2cf99347b1bfadfb233c5325c0",
+      }
+    }
+  };
+
+  web3Modal = new Web3Modal({
+    cacheProvider: false,
+    providerOptions,
+    disableInjectedProvider: false,
+  });
 }
 
 window.addEventListener('load', async () => {
