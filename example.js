@@ -80,6 +80,16 @@ async function refreshAccountData() {
 
 async function onConnect() {
   try {
+    web3Modal = new Web3Modal({
+      cacheProvider: false,
+      providerOptions: {
+        walletconnect: {
+          package: WalletConnectProvider,
+          options: {}
+        }
+      },
+      disableInjectedProvider: false,
+    });
     provider = await web3Modal.connect();
   } catch(e) {
     console.log("Wallet connection failed", e);
@@ -94,7 +104,7 @@ async function onConnect() {
 }
 
 async function onDisconnect() {
-  if (provider.close) {
+  if (provider && provider.close) {
     await provider.close();
     await web3Modal.clearCachedProvider();
     provider = null;
@@ -111,19 +121,6 @@ function init() {
     document.querySelector("#btn-connect").setAttribute("disabled", "disabled");
     return;
   }
-
-  const providerOptions = {
-    walletconnect: {
-      package: WalletConnectProvider,
-      options: {}
-    }
-  };
-
-  web3Modal = new Web3Modal({
-    cacheProvider: false,
-    providerOptions,
-    disableInjectedProvider: false,
-  });
 }
 
 window.addEventListener('load', async () => {
