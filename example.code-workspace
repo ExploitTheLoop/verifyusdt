@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+
+		"editor.codeActionsOnSave": {
+			"source.fixAll.eslint": "explicit",
+			"source.fixAll.tslint": "explicit",
+			"source.fixAll.stylelint": "explicit"
+		},
+
+		"prettier.requireConfig": true,
+
+	}
+}
