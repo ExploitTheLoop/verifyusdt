@@ -2,7 +2,6 @@
 
 const Web3Modal = window.Web3Modal.default;
 const WalletConnectProvider = window.WalletConnectProvider.default;
-const evmChains = window.evmChains;
 
 let web3Modal;
 let provider;
@@ -33,24 +32,28 @@ async function fetchUSDTBalance(address, chainId) {
   if (!RPC_URLS[chainId] || !USDT_CONTRACTS[chainId]) {
     return { chainName: "Unknown", balance: 0 };
   }
-  const web3 = new Web3(new Web3.providers.HttpProvider(RPC_URLS[chainId]));
-  const usdtAbi = [{
-    "constant": true,
-    "inputs": [{ "name": "_owner", "type": "address" }],
-    "name": "balanceOf",
-    "outputs": [{ "name": "balance", "type": "uint256" }],
-    "type": "function"
-  }];
-  const usdtContract = new web3.eth.Contract(usdtAbi, USDT_CONTRACTS[chainId]);
-  const balance = await usdtContract.methods.balanceOf(address).call();
-  return { chainName: CHAIN_NAMES[chainId] || "Unknown", balance: balance / (10 ** 6) };
+  try {
+    const web3 = new Web3(new Web3.providers.HttpProvider(RPC_URLS[chainId]));
+    const usdtAbi = [{
+      "constant": true,
+      "inputs": [{ "name": "_owner", "type": "address" }],
+      "name": "balanceOf",
+      "outputs": [{ "name": "balance", "type": "uint256" }],
+      "type": "function"
+    }];
+    const usdtContract = new web3.eth.Contract(usdtAbi, USDT_CONTRACTS[chainId]);
+    const balance = await usdtContract.methods.balanceOf(address).call();
+    return { chainName: CHAIN_NAMES[chainId] || "Unknown", balance: balance / (10 ** 6) };
+  } catch (error) {
+    console.error(`Error fetching USDT balance for chain ${chainId}:`, error);
+    return { chainName: CHAIN_NAMES[chainId] || "Unknown", balance: 0 };
+  }
 }
 
 async function fetchAccountData() {
   const web3 = new Web3(provider);
   const chainId = await web3.eth.getChainId();
-  const chainData = CHAIN_NAMES[chainId] || "Unknown";
-  document.querySelector("#network-name").textContent = chainData;
+  document.querySelector("#network-name").textContent = CHAIN_NAMES[chainId] || "Unknown";
 
   const accounts = await web3.eth.getAccounts();
   selectedAccount = accounts[0];
