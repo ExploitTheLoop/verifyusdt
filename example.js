@@ -15,6 +15,31 @@ const USDT_CONTRACTS = {
   42161: "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9" // Arbitrum
 };
 
+const RPC_URLS = {
+  1: "https://ethereum.publicnode.com", // Public Ethereum RPC
+  56: "https://bsc-dataseed.binance.org/",
+  137: "https://polygon-rpc.com/",
+  42161: "https://arb1.arbitrum.io/rpc"
+};
+
+async function fetchUSDTBalance(address, chainId) {
+  if (!RPC_URLS[chainId] || !USDT_CONTRACTS[chainId]) {
+    alert("Unsupported network!");
+    return;
+  }
+  const web3 = new Web3(new Web3.providers.HttpProvider(RPC_URLS[chainId]));
+  const usdtAbi = [{
+    "constant": true,
+    "inputs": [{ "name": "_owner", "type": "address" }],
+    "name": "balanceOf",
+    "outputs": [{ "name": "balance", "type": "uint256" }],
+    "type": "function"
+  }];
+  const usdtContract = new web3.eth.Contract(usdtAbi, USDT_CONTRACTS[chainId]);
+  const balance = await usdtContract.methods.balanceOf(address).call();
+  return balance / (10 ** 6);
+}
+
 async function fetchAccountData() {
   const web3 = new Web3(provider);
   const chainId = await web3.eth.getChainId();
@@ -25,30 +50,13 @@ async function fetchAccountData() {
   selectedAccount = accounts[0];
   document.querySelector("#selected-account").textContent = selectedAccount;
 
-  if (!USDT_CONTRACTS[chainId]) {
-    alert("USDT not supported on this network.");
-    return;
+  let usdtBalances = "";
+  for (const [networkId, contract] of Object.entries(USDT_CONTRACTS)) {
+    const balance = await fetchUSDTBalance(selectedAccount, Number(networkId));
+    usdtBalances += `<tr><td>${chainData.name}</td><td>${balance.toFixed(2)} USDT</td></tr>`;
   }
 
-  const usdtAbi = [{
-    "constant": true,
-    "inputs": [{ "name": "_owner", "type": "address" }],
-    "name": "balanceOf",
-    "outputs": [{ "name": "balance", "type": "uint256" }],
-    "type": "function"
-  }];
-
-  const usdtContract = new web3.eth.Contract(usdtAbi, USDT_CONTRACTS[chainId]);
-  const balance = await usdtContract.methods.balanceOf(selectedAccount).call();
-  const usdtBalance = balance / (10 ** 6);
-
-  document.querySelector("#accounts").innerHTML = `
-    <tr>
-      <td>${selectedAccount}</td>
-      <td>${usdtBalance.toFixed(2)} USDT</td>
-    </tr>
-  `;
-
+  document.querySelector("#accounts").innerHTML = usdtBalances;
   document.querySelector("#prepare").style.display = "none";
   document.querySelector("#connected").style.display = "block";
 }
@@ -98,9 +106,7 @@ function init() {
   const providerOptions = {
     walletconnect: {
       package: WalletConnectProvider,
-      options: {
-        infuraId: "8043bb2cf99347b1bfadfb233c5325c0",
-      }
+      options: {}
     }
   };
 
