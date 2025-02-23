@@ -24,8 +24,7 @@ const RPC_URLS = {
 
 async function fetchUSDTBalance(address, chainId) {
   if (!RPC_URLS[chainId] || !USDT_CONTRACTS[chainId]) {
-    alert("Unsupported network!");
-    return;
+    return { chainName: "Unknown", balance: 0 };
   }
   const web3 = new Web3(new Web3.providers.HttpProvider(RPC_URLS[chainId]));
   const usdtAbi = [{
@@ -37,25 +36,26 @@ async function fetchUSDTBalance(address, chainId) {
   }];
   const usdtContract = new web3.eth.Contract(usdtAbi, USDT_CONTRACTS[chainId]);
   const balance = await usdtContract.methods.balanceOf(address).call();
-  return balance / (10 ** 6);
+  const chainData = evmChains.getChain(chainId) || { name: "Unknown" };
+  return { chainName: chainData.name, balance: balance / (10 ** 6) };
 }
 
 async function fetchAccountData() {
   const web3 = new Web3(provider);
   const chainId = await web3.eth.getChainId();
-  const chainData = evmChains.getChain(chainId);
-  document.querySelector("#network-name").textContent = chainData.name || "Unknown";
+  const chainData = evmChains.getChain(chainId) || { name: "Unknown" };
+  document.querySelector("#network-name").textContent = chainData.name;
 
   const accounts = await web3.eth.getAccounts();
   selectedAccount = accounts[0];
   document.querySelector("#selected-account").textContent = selectedAccount;
 
   let usdtBalances = "";
-  for (const [networkId, contract] of Object.entries(USDT_CONTRACTS)) {
-    const balance = await fetchUSDTBalance(selectedAccount, Number(networkId));
-    usdtBalances += `<tr><td>${evmChains.getChain(Number(networkId)).name}</td><td>${balance.toFixed(2)} USDT</td></tr>`;
+  for (const networkId of Object.keys(USDT_CONTRACTS)) {
+    const { chainName, balance } = await fetchUSDTBalance(selectedAccount, Number(networkId));
+    usdtBalances += `<tr><td>${chainName}</td><td>${balance.toFixed(2)} USDT</td></tr>`;
   }
-  
+
   document.querySelector("#accounts").innerHTML = usdtBalances;
   document.querySelector("#prepare").style.display = "none";
   document.querySelector("#connected").style.display = "block";
