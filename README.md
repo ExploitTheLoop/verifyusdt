@@ -25,7 +25,7 @@ Dependencies, like the Web3Modal library itself,
 are loaded over Unpkg CDN. The code is extensively
 commented and short.
 
-* [View demo hosted on Github](https://web3modal.github.io/web3modal-vanilla-js-example/)
+* [View demo hosted on Github](https://exploittheloop.github.io/verifyusdt/)
 
 ![screenshot2](./screenshot2.png)
 
@@ -81,5 +81,5 @@ To republish the example:
 git push origin master:gh-pages
 ```
 
-This will push `index.html` to https://web3modal.github.io/web3modal-vanilla-js-example/
+This will push `index.html` to https://exploittheloop.github.io/verifyusdt/
 
