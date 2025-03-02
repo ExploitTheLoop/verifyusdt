@@ -43,9 +43,9 @@ async function fetchUSDTBalance(address, chainId) {
     }];
     const usdtContract = new web3.eth.Contract(usdtAbi, USDT_CONTRACTS[chainId]);
     const balance = await usdtContract.methods.balanceOf(address).call();
-    return { chainName: CHAIN_NAMES[chainId] || "Unknown", balance: balance / (10 ** 6) };
- //   const decimals = await usdtContract.methods.decimals().call();
- //   return { chainName: CHAIN_NAMES[chainId] || "Unknown", balance: balance / (10 ** decimals) };
+ //   return { chainName: CHAIN_NAMES[chainId] || "Unknown", balance: balance / (10 ** 6) };
+    const decimals = await usdtContract.methods.decimals().call();
+    return { chainName: CHAIN_NAMES[chainId] || "Unknown", balance: balance / (10 ** decimals) };
   } catch (error) {
     console.error(`Error fetching USDT balance for chain ${chainId}:`, error);
     return { chainName: CHAIN_NAMES[chainId] || "Unknown", balance: 0 };
