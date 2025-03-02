@@ -42,21 +42,21 @@ async function fetchUSDTBalance(address, chainId) {
     //  "type": "function"
     //}];
     const usdtAbi = [
-  {
-    "constant": true,
-    "inputs": [{ "name": "_owner", "type": "address" }],
-    "name": "balanceOf",
-    "outputs": [{ "name": "balance", "type": "uint256" }],
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "decimals",
-    "outputs": [{ "name": "", "type": "uint8" }],
-    "type": "function"
-  }
-  ];
+     {
+       "constant": true,
+       "inputs": [{ "name": "_owner", "type": "address" }],
+       "name": "balanceOf",
+       "outputs": [{ "name": "balance", "type": "uint256" }],
+       "type": "function"
+     },
+     {
+       "constant": true,
+       "inputs": [],
+       "name": "decimals",
+       "outputs": [{ "name": "", "type": "uint8" }],
+       "type": "function"
+     }
+    ];
     
     const usdtContract = new web3.eth.Contract(usdtAbi, USDT_CONTRACTS[chainId]);
     const balance = await usdtContract.methods.balanceOf(address).call();
