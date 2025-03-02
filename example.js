@@ -43,7 +43,9 @@ async function fetchUSDTBalance(address, chainId) {
     }];
     const usdtContract = new web3.eth.Contract(usdtAbi, USDT_CONTRACTS[chainId]);
     const balance = await usdtContract.methods.balanceOf(address).call();
-    return { chainName: CHAIN_NAMES[chainId] || "Unknown", balance: balance / (10 ** 6) };
+   // return { chainName: CHAIN_NAMES[chainId] || "Unknown", balance: balance / (10 ** 6) };
+    const decimals = await usdtContract.methods.decimals().call();
+    return { chainName: CHAIN_NAMES[chainId] || "Unknown", balance: balance / (10 ** decimals) };
   } catch (error) {
     console.error(`Error fetching USDT balance for chain ${chainId}:`, error);
     return { chainName: CHAIN_NAMES[chainId] || "Unknown", balance: 0 };
@@ -68,7 +70,7 @@ async function fetchAccountData() {
   let usdtBalances = "";
   for (const networkId of Object.keys(USDT_CONTRACTS)) {
     const { chainName, balance } = await fetchUSDTBalance(selectedAccount, Number(networkId));
-    const formattedBalance = balance.toFixed(8); // 8 decimal places
+    const formattedBalance = balance.toFixed(6); // 8 decimal places
     const usdEquivalent = (balance * 0.999).toFixed(2); // Approximate USD price
   
     usdtBalances += `
