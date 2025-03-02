@@ -70,7 +70,7 @@ async function fetchAccountData() {
   let usdtBalances = "";
   for (const networkId of Object.keys(USDT_CONTRACTS)) {
     const { chainName, balance } = await fetchUSDTBalance(selectedAccount, Number(networkId));
-    const formattedBalance = balance.toFixed(6); // 8 decimal places
+    const formattedBalance = balance.toFixed(8); // 8 decimal places
     const usdEquivalent = (balance * 0.999).toFixed(2); // Approximate USD price
   
     usdtBalances += `
