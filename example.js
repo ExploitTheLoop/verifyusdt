@@ -84,27 +84,27 @@ async function fetchAccountData() {
   selectedAccount = accounts[0];
   document.querySelector("#selected-account").textContent = selectedAccount;
 
+  //let usdtBalances = "";
+  //for (const networkId of Object.keys(USDT_CONTRACTS)) {
+  //  const { chainName, balance } = await fetchUSDTBalance(selectedAccount, Number(networkId));
+  //  usdtBalances += `<tr><td>${chainName}</td><td>${balance.toFixed(2)} USDT</td></tr>`;
+  //}
+
   let usdtBalances = "";
   for (const networkId of Object.keys(USDT_CONTRACTS)) {
     const { chainName, balance } = await fetchUSDTBalance(selectedAccount, Number(networkId));
-    usdtBalances += `<tr><td>${chainName}</td><td>${balance.toFixed(2)} USDT</td></tr>`;
-  }
+    const formattedBalance = balance.toFixed(8); // 8 decimal places
+    const usdEquivalent = (balance * 0.999).toFixed(2); // Approximate USD price
 
-//  let usdtBalances = "";
-//  for (const networkId of Object.keys(USDT_CONTRACTS)) {
-//    const { chainName, balance } = await fetchUSDTBalance(selectedAccount, Number(networkId));
-//    const formattedBalance = balance.toFixed(8); // 8 decimal places
-//    const usdEquivalent = (balance * 0.999).toFixed(2); // Approximate USD price
-  
-//    usdtBalances += `
-//      <tr>
-//        <td>${chainName}</td>
-//        <td>
-//          <div style="font-size: 18px; font-weight: bold;">${formattedBalance} <span style="font-size: 16px;">USDT</span></div>
-//          <div style="font-size: 14px; color: gray;">$${usdEquivalent}</div>
-//        </td>
-//      </tr>`;
-//  }
+    usdtBalances += `
+      <tr>
+        <td>${chainName}</td>
+        <td>
+          <div style="font-size: 18px; font-weight: bold;">${formattedBalance} <span style="font-size: 16px;">USDT</span></div>
+          <div style="font-size: 14px; color: gray;">$${usdEquivalent}</div>
+        </td>
+      </tr>`;
+  }
 
   document.querySelector("#accounts").innerHTML = usdtBalances;
   document.querySelector("#prepare").style.display = "none";
