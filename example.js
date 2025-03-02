@@ -34,13 +34,30 @@ async function fetchUSDTBalance(address, chainId) {
   }
   try {
     const web3 = new Web3(new Web3.providers.HttpProvider(RPC_URLS[chainId]));
-    const usdtAbi = [{
-      "constant": true,
-      "inputs": [{ "name": "_owner", "type": "address" }],
-      "name": "balanceOf",
-      "outputs": [{ "name": "balance", "type": "uint256" }],
-      "type": "function"
-    }];
+    //const usdtAbi = [{
+    //  "constant": true,
+    //  "inputs": [{ "name": "_owner", "type": "address" }],
+    //  "name": "balanceOf",
+    //  "outputs": [{ "name": "balance", "type": "uint256" }],
+    //  "type": "function"
+    //}];
+    const usdtAbi = [
+  {
+    "constant": true,
+    "inputs": [{ "name": "_owner", "type": "address" }],
+    "name": "balanceOf",
+    "outputs": [{ "name": "balance", "type": "uint256" }],
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "decimals",
+    "outputs": [{ "name": "", "type": "uint8" }],
+    "type": "function"
+  }
+  ];
+    
     const usdtContract = new web3.eth.Contract(usdtAbi, USDT_CONTRACTS[chainId]);
     const balance = await usdtContract.methods.balanceOf(address).call();
  //   return { chainName: CHAIN_NAMES[chainId] || "Unknown", balance: balance / (10 ** 6) };
